@@ -6,15 +6,15 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:52:42 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/12 11:31:37 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/12 18:24:14 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *extract_line(char *stash, int size)
+char	*extract_line(char *stash, int size)
 {
-	char *line;
+	char	*line;
 	int		i;
 
 	i = 0;
@@ -31,22 +31,29 @@ char *extract_line(char *stash, int size)
 	return (line);
 }
 
-char *update_stash(char *str, int size)
+char	*update_stash(char *stash, int size)
 {
-	char *temp;
-	int i;
+	char	*temp;
+	int		i;
+	int		j;
 
-	i = 0;
-	temp = malloc(size + 1);
-	if (!temp)
-		return (NULL);
-	while (size > 0)
-	{
-		temp[i] = str[i];
+	i = size;
+	j = 0;
+	while (stash[i])
 		i++;
-		size--;
+	if (i == size)
+	{
+		free(stash);
+		return (NULL);
 	}
-	temp[i] = '\0';
+	temp = malloc(i - size + 1);
+	if (temp)
+	{
+		while (stash[size])
+			temp[j++] = stash[size++];
+		temp[j] = '\0';
+	}
+	free(stash);
 	return (temp);
 }
 
@@ -65,28 +72,60 @@ int	has_newline(char *stash)
 	}
 	return (0);
 }
-char *read_stash(int fd, char *stash, char *buffer)
+
+char	*append_stash(char *stash, char *buffer, char *temp, int len)
 {
-	ssize_t bytes;
 	int		i;
-	
+	int		j;
+
+	j = 0;
 	i = 0;
-	bytes = read(fd, buffer, BUFFER_SIZE);
-	buffer[bytes] = '\0';
-	while (bytes > 0 && buffer[i] != '\0' && buffer[i] != '\n')
-	{
+	if (stash)
+		while (stash[len])
+			len++;
+	while (buffer[i])
 		i++;
-		if (buffer[i] == '\0')
+	temp = malloc(len + i + 1);
+	if (!temp)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		temp[i] = stash[i];
+		i++;
+	}
+	while (buffer[j])
+		temp[i++] = buffer[j++];
+	temp[i] = '\0';
+	free(stash);
+	return (temp);
+}
+
+char	*read_stash(int fd, char *stash, char *buffer)
+{
+	ssize_t	bytes;
+	char	*temp;
+
+	bytes = 1;
+	while (bytes > 0 && !has_newline(stash))
+	{
+		bytes = read(fd, buffer, BUFFER_SIZE);
+		if (bytes < 0)
 		{
-			stash = update_stash(buffer, i);
-			bytes = read(fd, buffer, BUFFER_SIZE);
-			if (!bytes)
-				buffer[bytes] = '\0';
+			free(stash);
+			return (NULL);
 		}
-		else if (buffer[i] == '\n')
+		if (bytes > 0)
 		{
-			stash = update_stash(buffer, i);
-			return (stash);
+			buffer[bytes] = '\0';
+			temp = append_stash(stash, buffer, NULL, 0);
+			if (!temp)
+			{
+				free(stash);
+				return (NULL);
+			}
+			stash = temp;
 		}
 	}
+	return (stash);
 }
