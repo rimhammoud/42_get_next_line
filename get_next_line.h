@@ -6,7 +6,7 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:43:11 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/12 12:11:38 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/16 13:01:52 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # endif
 
 char	*get_next_line(int fd);
-char	*read_stash(int fd, char *stash, char *buffer);
-char	*update_stash(char *str, int size);
-char	*extract_line(char *stash, int size);
+char	*read_line(int fd, char *str, char *buffer);
+char	*update_line(char *str, int size);
+char	*extract_line(char *str, int size);
 #endif

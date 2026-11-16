@@ -6,13 +6,13 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:52:42 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/12 18:24:14 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/16 13:54:36 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*extract_line(char *stash, int size)
+char	*extract_line(char *str, int size)
 {
 	char	*line;
 	int		i;
@@ -23,7 +23,7 @@ char	*extract_line(char *stash, int size)
 		return (NULL);
 	while (size > 1)
 	{
-		line[i] = stash[i];
+		line[i] = str[i];
 		i++;
 		size--;
 	}
@@ -31,7 +31,7 @@ char	*extract_line(char *stash, int size)
 	return (line);
 }
 
-char	*update_stash(char *stash, int size)
+char	*update_line(char *str, int size)
 {
 	char	*temp;
 	int		i;
@@ -39,49 +39,51 @@ char	*update_stash(char *stash, int size)
 
 	i = size;
 	j = 0;
-	while (stash[i])
+	while (str[i])
 		i++;
 	if (i == size)
 	{
-		free(stash);
+		free(str);
 		return (NULL);
 	}
 	temp = malloc(i - size + 1);
-	if (temp)
+	if (!temp)
 	{
-		while (stash[size])
-			temp[j++] = stash[size++];
-		temp[j] = '\0';
+		free (str);
+		return (NULL);
 	}
-	free(stash);
+	while (str[size])
+		temp[j++] = str[size++];
+	temp[j] = '\0';
+	free(str);
 	return (temp);
 }
 
-int	has_newline(char *stash)
+int	has_newline(char *str)
 {
 	int	i;
 
 	i = 0;
-	if (!stash)
+	if (!str)
 		return (0);
-	while (stash[i])
+	while (str[i])
 	{
-		if (stash[i] == '\n')
+		if (str[i] == '\n')
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-char	*append_stash(char *stash, char *buffer, char *temp, int len)
+char	*append_line(char *str, char *buffer, char *temp, int len)
 {
 	int		i;
 	int		j;
 
 	j = 0;
 	i = 0;
-	if (stash)
-		while (stash[len])
+	if (str)
+		while (str[len])
 			len++;
 	while (buffer[i])
 		i++;
@@ -91,41 +93,39 @@ char	*append_stash(char *stash, char *buffer, char *temp, int len)
 	i = 0;
 	while (i < len)
 	{
-		temp[i] = stash[i];
+		temp[i] = str[i];
 		i++;
 	}
 	while (buffer[j])
 		temp[i++] = buffer[j++];
 	temp[i] = '\0';
-	free(stash);
+	free(str);
 	return (temp);
 }
 
-char	*read_stash(int fd, char *stash, char *buffer)
+char	*read_line(int fd, char *str, char *buffer)
 {
-	ssize_t	bytes;
-	char	*temp;
+	int	bytes;
 
 	bytes = 1;
-	while (bytes > 0 && !has_newline(stash))
+	while (bytes > 0 && !has_newline(str))
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
 		{
-			free(stash);
+			free(str);
 			return (NULL);
 		}
 		if (bytes > 0)
 		{
 			buffer[bytes] = '\0';
-			temp = append_stash(stash, buffer, NULL, 0);
-			if (!temp)
+			str = append_line(str, buffer, NULL, 0);
+			if (!str)
 			{
-				free(stash);
+				free(str);
 				return (NULL);
 			}
-			stash = temp;
 		}
 	}
-	return (stash);
+	return (str);
 }
