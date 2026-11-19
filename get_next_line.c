@@ -6,7 +6,7 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:37:45 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/16 13:55:29 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/19 13:01:44 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,12 @@ char	*get_next_line(int fd)
 		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
+	{
+		free(str);
+		str = NULL;
 		return (NULL);
-	str = read_line(fd, str, buffer);
+	}
+	str = read_line(fd, str, buffer, 1);
 	free(buffer);
 	if (!str)
 		return (NULL);
@@ -34,6 +38,12 @@ char	*get_next_line(int fd)
 	if (str[size] == '\n')
 		size++;
 	line = extract_line(str, size + 1);
+	if (!line)
+	{
+		free(str);
+		str = NULL;
+		return (NULL);
+	}
 	str = update_line(str, size);
 	return (line);
 }
@@ -60,3 +70,4 @@ char	*get_next_line(int fd)
 // 	close(fd);
 // 	return (0);
 // }
+hello\nworld

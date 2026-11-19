@@ -6,7 +6,7 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:52:42 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/16 13:54:36 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/19 12:54:42 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,30 +33,22 @@ char	*extract_line(char *str, int size)
 
 char	*update_line(char *str, int size)
 {
-	char	*temp;
-	int		i;
-	int		j;
+	int	i;
 
-	i = size;
-	j = 0;
-	while (str[i])
+	i = 0;
+	while(str[size])
+	{
+		str[i] = str[size];
 		i++;
-	if (i == size)
+		size++;
+	}
+	str[i] = '\0';
+	if (i == 0)
 	{
 		free(str);
 		return (NULL);
 	}
-	temp = malloc(i - size + 1);
-	if (!temp)
-	{
-		free (str);
-		return (NULL);
-	}
-	while (str[size])
-		temp[j++] = str[size++];
-	temp[j] = '\0';
-	free(str);
-	return (temp);
+	return (str);
 }
 
 int	has_newline(char *str)
@@ -75,40 +67,52 @@ int	has_newline(char *str)
 	return (0);
 }
 
-char	*append_line(char *str, char *buffer, char *temp, int len)
+char	*append_line(char *str, char *buffer, char *temp, size_t len)
 {
-	int		i;
-	int		j;
+	size_t				i;
+	size_t				j;
+	static size_t		cap;
 
 	j = 0;
 	i = 0;
+	if (!str)
+		cap = 0;
 	if (str)
 		while (str[len])
 			len++;
 	while (buffer[i])
 		i++;
-	temp = malloc(len + i + 1);
-	if (!temp)
-		return (NULL);
-	i = 0;
-	while (i < len)
+	temp = str;
+	if (len + i + 1 > cap)
 	{
-		temp[i] = str[i];
-		i++;
+		if (cap == 0)
+			cap = BUFFER_SIZE + 1;
+		while (cap < len + i + 1)
+			cap *= 2;
+		temp = malloc(cap);
+		if (!temp)
+		return (NULL);
+		i = 0;
+		while (i < len)
+		{
+			temp[i] = str[i];
+			i++;
+		}
+
+		free(str);
 	}
+	i = len;
 	while (buffer[j])
-		temp[i++] = buffer[j++];
+	temp[i++] = buffer[j++];
 	temp[i] = '\0';
-	free(str);
 	return (temp);
 }
 
-char	*read_line(int fd, char *str, char *buffer)
+char	*read_line(int fd, char *str, char *buffer, int bytes)
 {
-	int	bytes;
+	char	*temp;
 
-	bytes = 1;
-	while (bytes > 0 && !has_newline(str))
+	while (bytes > 0)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
@@ -119,12 +123,15 @@ char	*read_line(int fd, char *str, char *buffer)
 		if (bytes > 0)
 		{
 			buffer[bytes] = '\0';
-			str = append_line(str, buffer, NULL, 0);
-			if (!str)
+			temp = append_line(str, buffer, NULL, 0);
+			if (!temp)
 			{
 				free(str);
 				return (NULL);
 			}
+			str = temp;
+			if (has_newline(buffer))
+				return (str);
 		}
 	}
 	return (str);
