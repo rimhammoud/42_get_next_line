@@ -53,5 +53,3 @@ Reusing the existing allocation for leftover characters also avoids unnecessary 
 
 - [Linux `read()` manual](https://man7.org/linux/man-pages/man2/read.2.html)
 - [Linux `malloc()` and `free()` manual](https://man7.org/linux/man-pages/man3/malloc.3.html)
-
-**AI usage:** AI was used to clarify C concepts, explain static variables and memory management, review implementation logic, and help identify errors during testing.
