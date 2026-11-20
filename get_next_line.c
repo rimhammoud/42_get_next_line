@@ -6,7 +6,7 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:37:45 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/20 13:33:43 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/20 17:42:30 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,25 +75,3 @@ char	*get_next_line(int fd)
 	str = update_line(str, len_str(str));
 	return (line);
 }
-// #include <stdio.h>
-// #include <fcntl.h>
-
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*line;
-// 	fd = open("test.txt", O_RDONLY);
-// 	if (fd < 0)
-// 		return (1);
-// 	line = get_next_line(fd);
-// 	int i = 1;
-// 	while (line)
-// 	{
-// 		printf("line %d: %s\n", i, line);
-// 		free(line);
-// 		line = get_next_line(fd);
-// 		i++;
-// 	}
-// 	close(fd);
-// 	return (0);
-// }
