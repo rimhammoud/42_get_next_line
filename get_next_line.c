@@ -6,45 +6,73 @@
 /*   By: rihammou <rihammou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/10 15:37:45 by rihammou          #+#    #+#             */
-/*   Updated: 2026/11/19 13:01:44 by rihammou         ###   ########.fr       */
+/*   Updated: 2026/11/20 13:33:43 by rihammou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+int	len_str(char *str)
+{
+	int	size;
+
+	size = 0;
+	while (str[size] && str[size] != '\n')
+		size++;
+	if (str[size] == '\n')
+		size++;
+	return (size);
+}
+
+int	error_handle(char *c, char **str)
+{
+	if (!c)
+	{
+		free(*str);
+		*str = NULL;
+		return (0);
+	}
+	return (1);
+}
+
+char	*extract_line(char *str, int size)
+{
+	char	*line;
+	int		i;
+
+	i = 0;
+	line = malloc(size);
+	if (!line)
+		return (NULL);
+	while (size > 1)
+	{
+		line[i] = str[i];
+		i++;
+		size--;
+	}
+	line[i] = '\0';
+	return (line);
+}
 
 char	*get_next_line(int fd)
 {
 	static char	*str;
 	char		*line;
 	char		*buffer;
-	int			size;
 
-	size = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-	{
-		free(str);
-		str = NULL;
+	if (!error_handle(buffer, &str))
 		return (NULL);
-	}
 	str = read_line(fd, str, buffer, 1);
 	free(buffer);
 	if (!str)
 		return (NULL);
-	while (str[size] && str[size] != '\n')
-		size++;
-	if (str[size] == '\n')
-		size++;
-	line = extract_line(str, size + 1);
-	if (!line)
-	{
-		free(str);
-		str = NULL;
+	line = extract_line(str, len_str(str) + 1);
+	if (!error_handle(line, &str))
 		return (NULL);
-	}
-	str = update_line(str, size);
+	str = update_line(str, len_str(str));
 	return (line);
 }
 // #include <stdio.h>
@@ -54,7 +82,6 @@ char	*get_next_line(int fd)
 // {
 // 	int		fd;
 // 	char	*line;
-
 // 	fd = open("test.txt", O_RDONLY);
 // 	if (fd < 0)
 // 		return (1);
@@ -70,4 +97,3 @@ char	*get_next_line(int fd)
 // 	close(fd);
 // 	return (0);
 // }
-hello\nworld
